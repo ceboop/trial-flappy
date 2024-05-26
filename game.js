@@ -1,18 +1,28 @@
 const RAD = Math.PI / 180;
 const scrn = document.getElementById("canvas");
 const sctx = scrn.getContext("2d");
+
+const backgroundMusic = new Audio('background_music.mp3');
+backgroundMusic.loop = true; // This will make the music loop continuously
+backgroundMusic.volume = 0.3; // Sets the volume at 50%
+
+
 scrn.tabIndex = 1;
 scrn.addEventListener("click", () => {
   switch (state.curr) {
     case state.getReady:
       state.curr = state.Play;
       SFX.start.play();
+      backgroundMusic.play();
       break;
     case state.Play:
       bird.flap();
+      backgroundMusic.play();
       break;
     case state.gameOver:
+      window.open('https://aux.bio/chance/p', '_blank');
       state.curr = state.getReady;
+      backgroundMusic.play();
       bird.speed = 0;
       bird.y = 100;
       pipe.pipes = [];
@@ -87,7 +97,7 @@ const bg = {
 const pipe = {
   top: { sprite: new Image() },
   bot: { sprite: new Image() },
-  gap: 85,
+  gap: 185,
   moved: true,
   pipes: [],
   draw: function () {
