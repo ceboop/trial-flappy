@@ -97,7 +97,7 @@ const bg = {
 const pipe = {
   top: { sprite: new Image() },
   bot: { sprite: new Image() },
-  gap: 185,
+  gap: 125,
   moved: true,
   pipes: [],
   draw: function () {
@@ -285,12 +285,17 @@ const UI = {
           let bs = `BEST  :     ${this.score.best}`;
           sctx.fillText(sc, scrn.width / 2 - 80, scrn.height / 2 + 0);
           sctx.strokeText(sc, scrn.width / 2 - 80, scrn.height / 2 + 0);
-          sctx.fillText(bs, scrn.width / 2 - 80, scrn.height / 2 + 30);
-          sctx.strokeText(bs, scrn.width / 2 - 80, scrn.height / 2 + 30);
+          sctx.fillText("CLICK TO RETRY", scrn.width / 2 - 80, scrn.height / 2 + 30);
+          sctx.strokeText("CLICK TO RETRY", scrn.width / 2 - 80, scrn.height / 2 + 30);
         } catch (e) {
           sctx.fillText(sc, scrn.width / 2 - 85, scrn.height / 2 + 15);
           sctx.strokeText(sc, scrn.width / 2 - 85, scrn.height / 2 + 15);
         }
+
+
+        // // Add "CLICK TO RETRY" text
+        // sctx.fillText("CLICK TO RETRY", scrn.width / 2 - 100, scrn.height / 2 + 60);
+        // sctx.strokeText("CLICK TO RETRY", scrn.width / 2 - 100, scrn.height / 2 + 60);
 
         break;
     }
@@ -334,7 +339,7 @@ function update() {
 }
 
 function draw() {
-  sctx.fillStyle = "#30c0df";
+  sctx.fillStyle = "#3ed1e0";
   sctx.fillRect(0, 0, scrn.width, scrn.height);
   bg.draw();
   pipe.draw();
