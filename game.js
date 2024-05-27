@@ -24,7 +24,7 @@ scrn.addEventListener("click", (event) => {
       break;
     case state.gameOver:
       if (y >= UI.streamTextY - 20 && y <= UI.streamTextY + 10 && x >= UI.tx - 80 && x <= UI.tx + 80) {
-        window.open('https://www.aux.com', '_blank');
+        window.open('https://aux.bio/chance/honeyy', '_blank');
       } else if (y >= UI.retryTextY - 20 && y <= UI.retryTextY + 10 && x >= UI.tx - 80 && x <= UI.tx + 80) {
         state.curr = state.getReady;
         backgroundMusic.play();
