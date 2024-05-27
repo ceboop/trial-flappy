@@ -3,12 +3,15 @@ const scrn = document.getElementById("canvas");
 const sctx = scrn.getContext("2d");
 
 const backgroundMusic = new Audio('background_music.mp3');
-backgroundMusic.loop = true; // This will make the music loop continuously
-backgroundMusic.volume = 0.3; // Sets the volume at 50%
-
+backgroundMusic.loop = true;
+backgroundMusic.volume = 0.3;
 
 scrn.tabIndex = 1;
-scrn.addEventListener("click", () => {
+scrn.addEventListener("click", (event) => {
+  const rect = scrn.getBoundingClientRect();
+  const x = event.clientX - rect.left;
+  const y = event.clientY - rect.top;
+
   switch (state.curr) {
     case state.getReady:
       state.curr = state.Play;
@@ -20,21 +23,23 @@ scrn.addEventListener("click", () => {
       backgroundMusic.play();
       break;
     case state.gameOver:
-      window.open('https://aux.bio/chance/p', '_blank');
-      state.curr = state.getReady;
-      backgroundMusic.play();
-      bird.speed = 0;
-      bird.y = 100;
-      pipe.pipes = [];
-      UI.score.curr = 0;
-      SFX.played = false;
+      if (y >= UI.streamTextY - 20 && y <= UI.streamTextY + 10 && x >= UI.tx - 80 && x <= UI.tx + 80) {
+        window.open('https://www.aux.com', '_blank');
+      } else if (y >= UI.retryTextY - 20 && y <= UI.retryTextY + 10 && x >= UI.tx - 80 && x <= UI.tx + 80) {
+        state.curr = state.getReady;
+        backgroundMusic.play();
+        bird.speed = 0;
+        bird.y = 100;
+        pipe.pipes = [];
+        UI.score.curr = 0;
+        SFX.played = false;
+      }
       break;
   }
 });
 
 scrn.onkeydown = function keyDown(e) {
   if (e.keyCode == 32 || e.keyCode == 87 || e.keyCode == 38) {
-    // Space Key or W key or arrow up
     switch (state.curr) {
       case state.getReady:
         state.curr = state.Play;
@@ -239,6 +244,8 @@ const UI = {
   tx: 0,
   ty: 0,
   frame: 0,
+  streamTextY: 0,
+  retryTextY: 0,
   draw: function () {
     switch (state.curr) {
       case state.getReady:
@@ -251,13 +258,29 @@ const UI = {
         sctx.drawImage(this.tap[this.frame].sprite, this.tx, this.ty);
         break;
       case state.gameOver:
-        this.y = parseFloat(scrn.height - this.gameOver.sprite.height) / 2;
+        // Draw the dimming effect
+        sctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+        sctx.fillRect(0, 0, scrn.width, scrn.height);
+
+        this.y = parseFloat(scrn.height - this.gameOver.sprite.height) / 3;
         this.x = parseFloat(scrn.width - this.gameOver.sprite.width) / 2;
-        this.tx = parseFloat(scrn.width - this.tap[0].sprite.width) / 2;
-        this.ty =
-          this.y + this.gameOver.sprite.height - this.tap[0].sprite.height;
         sctx.drawImage(this.gameOver.sprite, this.x, this.y);
-        sctx.drawImage(this.tap[this.frame].sprite, this.tx, this.ty);
+
+        // Add the text for streaming and retrying
+        sctx.fillStyle = "#FFFFFF";
+        sctx.strokeStyle = "#000000";
+        sctx.lineWidth = "2";
+        sctx.font = "40px Squada One";
+        sctx.textAlign = "center";
+        UI.streamTextY = this.y + this.gameOver.sprite.height + 40;
+        UI.retryTextY = this.y + this.gameOver.sprite.height + 80;
+        sctx.fillText("CLICK TO STREAM", scrn.width / 2, UI.streamTextY);
+        sctx.strokeText("CLICK TO STREAM", scrn.width / 2, UI.streamTextY);
+        sctx.fillText("CLICK TO RETRY", scrn.width / 2, UI.retryTextY);
+        sctx.strokeText("CLICK TO RETRY", scrn.width / 2, UI.retryTextY);
+
+        this.tx = scrn.width / 2;
+        this.ty = this.y + this.gameOver.sprite.height;
         break;
     }
     this.drawScore();
@@ -265,12 +288,13 @@ const UI = {
   drawScore: function () {
     sctx.fillStyle = "#FFFFFF";
     sctx.strokeStyle = "#000000";
+    sctx.textAlign = "center";
     switch (state.curr) {
       case state.Play:
         sctx.lineWidth = "2";
         sctx.font = "35px Squada One";
-        sctx.fillText(this.score.curr, scrn.width / 2 - 5, 50);
-        sctx.strokeText(this.score.curr, scrn.width / 2 - 5, 50);
+        sctx.fillText(this.score.curr, scrn.width / 2, 50);
+        sctx.strokeText(this.score.curr, scrn.width / 2, 50);
         break;
       case state.gameOver:
         sctx.lineWidth = "2";
@@ -283,19 +307,14 @@ const UI = {
           );
           localStorage.setItem("best", this.score.best);
           let bs = `BEST  :     ${this.score.best}`;
-          sctx.fillText(sc, scrn.width / 2 - 80, scrn.height / 2 + 0);
-          sctx.strokeText(sc, scrn.width / 2 - 80, scrn.height / 2 + 0);
-          sctx.fillText("CLICK TO RETRY", scrn.width / 2 - 80, scrn.height / 2 + 30);
-          sctx.strokeText("CLICK TO RETRY", scrn.width / 2 - 80, scrn.height / 2 + 30);
+          sctx.fillText(sc, scrn.width / 2, scrn.height / 2 - 50);
+          sctx.strokeText(sc, scrn.width / 2, scrn.height / 2 - 50);
+          sctx.fillText(bs, scrn.width / 2, scrn.height / 2 - 20);
+          sctx.strokeText(bs, scrn.width / 2, scrn.height / 2 - 20);
         } catch (e) {
-          sctx.fillText(sc, scrn.width / 2 - 85, scrn.height / 2 + 15);
-          sctx.strokeText(sc, scrn.width / 2 - 85, scrn.height / 2 + 15);
+          sctx.fillText(sc, scrn.width / 2, scrn.height / 2 - 50);
+          sctx.strokeText(sc, scrn.width / 2, scrn.height / 2 - 50);
         }
-
-
-        // // Add "CLICK TO RETRY" text
-        // sctx.fillText("CLICK TO RETRY", scrn.width / 2 - 100, scrn.height / 2 + 60);
-        // sctx.strokeText("CLICK TO RETRY", scrn.width / 2 - 100, scrn.height / 2 + 60);
 
         break;
     }
@@ -343,7 +362,6 @@ function draw() {
   sctx.fillRect(0, 0, scrn.width, scrn.height);
   bg.draw();
   pipe.draw();
-
   bird.draw();
   gnd.draw();
   UI.draw();
